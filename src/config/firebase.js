@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getStorage } from "firebase/storage";
 import {
   GoogleAuthProvider,
   getAuth,
@@ -17,7 +18,6 @@ import {
   where,
   addDoc,
 } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -97,6 +97,8 @@ const logout = () => {
   signOut(auth);
 };
 
+const storage = getStorage(app);
+
 export {
   auth,
   db,
@@ -105,4 +107,5 @@ export {
   registerWithEmailAndPassword,
   sendPasswordReset,
   logout,
+  storage,
 };

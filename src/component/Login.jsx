@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import "./Login.css";
+import { GooglePlusOutlined } from "@ant-design/icons";
 import {
   auth,
   logInWithEmailAndPassword,
   signInWithGoogle,
 } from "../config/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Button } from "antd";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,15 +38,19 @@ function Login() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
         />
-        <button
-          className="login__btn"
+        <Button
+          type="primary"
           onClick={() => logInWithEmailAndPassword(email, password)}
         >
           Login
-        </button>
-        <button className="login__btn login__google" onClick={signInWithGoogle}>
-          Login with Google
-        </button>
+        </Button>
+        <Button
+          style={{ margin: "10px 0" }}
+          type="danger"
+          onClick={signInWithGoogle}
+        >
+          <GooglePlusOutlined /> Google Account
+        </Button>
         <div>
           <Link to="/reset">Forgot Password</Link>
         </div>
