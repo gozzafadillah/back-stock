@@ -95,6 +95,7 @@ const sendPasswordReset = async (email) => {
 
 const logout = () => {
   signOut(auth);
+  localStorage.clear();
 };
 
 const storage = getStorage(app);
