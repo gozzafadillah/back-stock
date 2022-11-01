@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, logout, storage } from "../config/firebase";
+import { auth, logout } from "../config/firebase";
 
 import {
   PieChartOutlined,
@@ -10,7 +9,10 @@ import {
   ShoppingCartOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Layout, Menu } from "antd";
+import { Breadcrumb, Card, Col, Layout, Menu, Row } from "antd";
+import TableDashboard from "../component/dashboard/TableDashboard";
+import { useQuery } from "@apollo/client";
+import { GetUserById } from "../config/Apollo/Query";
 
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -38,43 +40,28 @@ const items = [
 const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [user, loading] = useAuthState(auth);
+  const { data: dataUser } = useQuery(GetUserById, {
+    variables: {
+      id: localStorage.getItem("uid"),
+    },
+  });
+
   const navigate = useNavigate();
   useEffect(() => {
     if (loading) {
       // maybe trigger a loading screen
       return;
     }
-    if (user === null) navigate("/login");
+    if (!user) {
+      navigate("/login");
+    }
   }, [user, loading]);
 
-  const [imgUrl, setImgUrl] = useState(null);
-  const [progresspercent, setProgresspercent] = useState(0);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const file = e.target[0]?.files[0];
-    if (!file) return;
-    const storageRef = ref(storage, `files/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgresspercent(progress);
-      },
-      (error) => {
-        alert(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImgUrl(downloadURL);
-        });
-      }
-    );
-  };
+  useEffect(() => {
+    if (dataUser?.users[0].tokoId === null) {
+      navigate("/register/store");
+    }
+  }, [dataUser]);
 
   return (
     <Layout
@@ -101,7 +88,12 @@ const Dashboard = () => {
           style={{
             padding: 0,
           }}
-        />
+        >
+          <h1 style={{ fontSize: "x-large", fontWeight: "bolder" }}>
+            Back-Stock App
+          </h1>
+        </Header>
+
         <Content
           style={{
             margin: "0 16px",
@@ -118,25 +110,47 @@ const Dashboard = () => {
             className="site-layout-background"
             style={{
               padding: 24,
-              minHeight: 360,
+              minHeight: 180,
             }}
           >
-            <h1>Hello, this is Dashboard pages</h1>
-            <form onSubmit={handleSubmit} className="form">
-              <input type="file" />
-              <button type="submit">Upload</button>
-            </form>
-            {!imgUrl && (
-              <div className="outerbar">
-                <div
-                  className="innerbar"
-                  style={{ width: `${progresspercent}%` }}
-                >
-                  {progresspercent}%
-                </div>
-              </div>
-            )}
-            {imgUrl && <img src={imgUrl} alt="uploaded file" height={200} />}
+            <div className="site-card-wrapper">
+              <Row style={{ justifyContent: "center" }} gutter={8}>
+                <Col span={4}>
+                  <Card
+                    style={{ backgroundColor: "#D3e4e4", height: "8rem" }}
+                    title="Products"
+                    bordered={true}
+                  >
+                    <h3 style={{ fontWeight: "bold" }}>0</h3>
+                  </Card>
+                </Col>
+                <Col span={4}>
+                  <Card
+                    style={{ backgroundColor: "#D3e4e4", height: "8rem" }}
+                    title="Stock"
+                    bordered={true}
+                  >
+                    <h3 style={{ fontWeight: "bold" }}>0</h3>
+                  </Card>
+                </Col>
+              </Row>
+            </div>
+          </div>
+          <div
+            className="site-layout-background"
+            style={{
+              padding: 24,
+              minHeight: 160,
+            }}
+          >
+            <Row gutter={16} style={{ justifyContent: "center" }}>
+              <Col span={10}>
+                <TableDashboard />
+              </Col>
+              <Col span={10}>
+                <TableDashboard />
+              </Col>
+            </Row>
           </div>
         </Content>
         <Footer

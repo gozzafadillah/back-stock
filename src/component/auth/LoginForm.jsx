@@ -1,29 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
-import "./Login.css";
-import { GooglePlusOutlined } from "@ant-design/icons";
-import {
-  auth,
-  logInWithEmailAndPassword,
-  signInWithGoogle,
-} from "../config/firebase";
 import { Button } from "antd";
-function Login() {
+import React, { useState } from "react";
+import { GooglePlusOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+
+const LoginForm = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, loading] = useAuthState(auth);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (loading) {
-      // maybe trigger a loading screen
-      return;
-    }
-    if (user) navigate("/dashboard");
-  }, [user, loading]);
   return (
     <div className="login">
       <div className="login__container">
+        <h1 style={{ textAlign: "center" }}>Login</h1>
         <input
           type="text"
           className="login__textBox"
@@ -40,14 +26,14 @@ function Login() {
         />
         <Button
           type="primary"
-          onClick={() => logInWithEmailAndPassword(email, password)}
+          onClick={() => props.handleClick(email, password)}
         >
           Login
         </Button>
         <Button
           style={{ margin: "10px 0" }}
           type="danger"
-          onClick={signInWithGoogle}
+          onClick={props.signInWithGoogle}
         >
           <GooglePlusOutlined /> Google Account
         </Button>
@@ -60,5 +46,6 @@ function Login() {
       </div>
     </div>
   );
-}
-export default Login;
+};
+
+export default LoginForm;
