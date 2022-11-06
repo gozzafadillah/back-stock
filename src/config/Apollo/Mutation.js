@@ -75,6 +75,16 @@ const UpdateQtyProduct = gql`
 `;
 
 const InsertDetailProduct = gql`
+  mutation InsertDetailProduct($objects: [detail_product_insert_input!] = {}) {
+    insert_detail_product(objects: $objects) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+const insertDetailProductOne = gql`
   mutation CreateDetailProduct($object: detail_product_insert_input = {}) {
     insert_detail_product_one(object: $object) {
       id
@@ -104,4 +114,5 @@ export {
   EditProduct,
   DestroyProduct,
   UpdateQtyProduct,
+  insertDetailProductOne,
 };

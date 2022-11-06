@@ -73,6 +73,7 @@ const sendPasswordReset = async (email) => {
 const logout = () => {
   signOut(auth);
   Cookies.remove("id");
+  Cookies.remove("tokoId");
 };
 
 const storage = getStorage(app);

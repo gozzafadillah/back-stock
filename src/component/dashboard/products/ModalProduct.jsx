@@ -4,10 +4,7 @@ import { Button, Modal } from "antd";
 import Cookies from "js-cookie";
 import React from "react";
 import { useState } from "react";
-import {
-  CreateProductData,
-  InsertDetailProduct,
-} from "../../../config/Apollo/Mutation";
+import { InsertDetailProduct } from "../../../config/Apollo/Mutation";
 
 const ModalProduct = (props) => {
   const [product, setProduct] = useState({
@@ -18,7 +15,6 @@ const ModalProduct = (props) => {
     categoryId: 0,
   });
   const [modalProduct, setModalProduct] = useState(props.modalProduct);
-  const [CreateProduct, { data: dataProduct }] = useMutation(CreateProductData);
   const [CreateDetail, { data: detailProduct }] =
     useMutation(InsertDetailProduct);
 
@@ -28,30 +24,26 @@ const ModalProduct = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    CreateProduct({
-      variables: {
-        objects: {
-          namaProduk: product.namaProduk,
-          id: product.id,
-          harga: product.harga,
-          qty: product.qty,
-          categoryId: product.categoryId,
-        },
-      },
-    });
-
     CreateDetail({
       variables: {
-        object: {
-          tokoId: Cookies.get("tokoId"),
-          produkId: product.id,
+        objects: {
+          product: {
+            data: {
+              id: product.id,
+              namaProduk: product.namaProduk,
+              qty: product.qty,
+              harga: product.harga,
+              categoryId: product.categoryId,
+            },
+          },
           qty: product.qty,
           status: "Masuk",
+          tokoId: Cookies.get("tokoId"),
         },
       },
     });
 
-    console.log([dataProduct, detailProduct]);
+    console.log([detailProduct]);
 
     setProduct({
       id: uuidv4(),
@@ -60,8 +52,6 @@ const ModalProduct = (props) => {
       qty: 0,
       harga: 0,
     });
-
-    console.log("product ", product);
 
     document.getElementById("form-product").reset();
     setModalProduct(false);

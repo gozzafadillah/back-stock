@@ -9,6 +9,7 @@ import {
   HddOutlined,
   ShoppingCartOutlined,
   LogoutOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Layout } from "antd";
 import { GetUserById } from "../config/Apollo/Query";
@@ -34,6 +35,7 @@ const Dashboard = () => {
     },
   });
   let img = "";
+  console.log("user login", dataUser);
 
   useEffect(() => {
     if (dataUser?.users[0].toko === null) {
@@ -51,6 +53,13 @@ const Dashboard = () => {
   };
 
   const items = [
+    getItem(
+      <div style={{ color: "white", fontWeight: "bold" }}>
+        {dataUser?.users[0].toko?.namaToko.toUpperCase()}
+      </div>,
+      "0",
+      <UserOutlined />
+    ),
     getItem(<Link to="/dashboard">Dashboard</Link>, "1", <PieChartOutlined />),
     getItem(
       <Link to="/dashboard/product">Products</Link>,

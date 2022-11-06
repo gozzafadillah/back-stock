@@ -3,6 +3,7 @@ import { Breadcrumb, Card, Col, Row } from "antd";
 import Cookies from "js-cookie";
 import React from "react";
 import {
+  CountProduct,
   HistoryProductByTokoId,
   HistoryToko,
 } from "../../config/Apollo/Subscription";
@@ -18,6 +19,12 @@ const Main = () => {
       tokoId: Cookies.get("tokoId"),
     },
   });
+  const { data: countProduct } = useSubscription(CountProduct, {
+    variables: {
+      tokoId: Cookies.get("tokoId"),
+    },
+  });
+
   const { data: subDataDetail, error: subDetailErr } = useSubscription(
     HistoryToko,
     {
@@ -51,16 +58,9 @@ const Main = () => {
                 title="Products"
                 bordered={true}
               >
-                <h3 style={{ fontWeight: "bold" }}>0</h3>
-              </Card>
-            </Col>
-            <Col span={4}>
-              <Card
-                style={{ backgroundColor: "#D3e4e4", height: "8rem" }}
-                title="Stock"
-                bordered={true}
-              >
-                <h3 style={{ fontWeight: "bold" }}>0</h3>
+                <h3 style={{ fontWeight: "bold" }}>
+                  {countProduct?.product_aggregate.aggregate.count}
+                </h3>
               </Card>
             </Col>
           </Row>
