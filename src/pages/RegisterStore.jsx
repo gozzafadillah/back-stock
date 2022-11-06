@@ -1,17 +1,16 @@
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React, { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, logout, storage } from "../config/firebase";
+import { storage } from "../config/firebase";
 import "../assets/css/register.css";
 import { useMutation, useQuery } from "@apollo/client";
-import { GetUserById } from "../config/Apollo/Query";
 import { uuidv4 } from "@firebase/util";
 import { useNavigate } from "react-router-dom";
 import {
   InsertTokoUser,
   UpdateStatusTokoUser,
 } from "../config/Apollo/Mutation";
-
+import Cookies from "js-cookie";
+import { GetUserById } from "../config/Apollo/Query";
 const DataStore = {
   id: uuidv4(),
   namaToko: "",
@@ -21,20 +20,18 @@ const DataStore = {
 
 const RegisterStore = () => {
   const [data, setData] = useState(DataStore);
-  const [user, loading, error] = useAuthState(auth);
-
-  const [imgUrl, setImgUrl] = useState(null);
+  const [imgUrl, setImgUrl] = useState("");
   const [progresspercent, setProgresspercent] = useState(0);
-
-  const [InsertToko, { errorTokoUser }] = useMutation(InsertTokoUser);
-
-  const [ChangeStatUserToko, { error: errorUpdateStatUser }] =
-    useMutation(UpdateStatusTokoUser);
   const { data: dataUser } = useQuery(GetUserById, {
     variables: {
-      id: localStorage.getItem("uid"),
+      id: Cookies.get("id"),
     },
   });
+
+  const [InsertToko, { error: errorTokoUser }] = useMutation(InsertTokoUser);
+
+  const [ChangeStatUserToko, { data: updateUser, error: errorChangeStat }] =
+    useMutation(UpdateStatusTokoUser);
 
   const navigate = useNavigate();
 
@@ -43,6 +40,7 @@ const RegisterStore = () => {
 
     const file = e.target[2]?.files[0];
     if (!file) return;
+
     const storageRef = ref(storage, `files/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
     uploadTask.on(
@@ -58,53 +56,45 @@ const RegisterStore = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImgUrl(downloadURL);
+          InsertToko({
+            variables: {
+              userId: Cookies.get("id"),
+              objects: {
+                id: data.id,
+                namaToko: data.namaToko,
+                alamat: data.alamat,
+                image: downloadURL,
+              },
+            },
+          });
         });
       }
     );
 
-    const newData = {
-      id: data.id,
-      namaToko: data.namaToko,
-      alamat: data.alamat,
-      imgProfile: imgUrl,
-    };
-
-    InsertToko({
-      variables: {
-        userId: localStorage.getItem("uid"),
-        objects: {
-          id: newData.id,
-          namaToko: newData.namaToko,
-          alamat: newData.alamat,
-          image: newData.imgProfile,
-          userID: localStorage.getItem("uid"),
-        },
-      },
-    });
+    Cookies.set("tokoId", data.id);
 
     ChangeStatUserToko({
       variables: {
-        id: localStorage.getItem("uid"),
-        tokoId: newData.id,
+        id: Cookies.get("id"),
+        tokoId: data.id,
       },
     });
   };
 
   function onChangeHandler(e) {
-    console.log({ e });
     setData({ ...data, [e.target.name]: e.target.value });
   }
 
   useEffect(() => {
-    console.log({ user, loading, error, errorTokoUser, errorUpdateStatUser });
-  }, [user, loading, error]);
+    console.log([[errorChangeStat, errorTokoUser]]);
+  }, [errorChangeStat, errorTokoUser]);
+  console.log("updata : ", updateUser?.update_users);
 
   useEffect(() => {
-    if (imgUrl !== null) {
-      if (dataUser?.users[0].tokoId !== null) navigate("../dashboard");
+    if (updateUser?.update_users.returning) {
+      navigate("../dashboard");
     }
-  }, [imgUrl]);
+  });
 
   return (
     <div className="register">
@@ -153,7 +143,6 @@ const RegisterStore = () => {
           <button type="submit" style={{ margin: "10px 0" }}>
             Register
           </button>
-          <button onClick={logout}>logout</button>
         </form>
       </div>
     </div>

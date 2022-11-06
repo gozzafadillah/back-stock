@@ -1,52 +1,37 @@
-import { Space, Table, Tag } from "antd";
+import { Col, Row } from "antd";
+import moment from "moment/moment";
 import React from "react";
+import TableDetailList from "./TableDetailList";
 
-const TableDashboard = () => {
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Qty",
-      dataIndex: "qty",
-      key: "qty",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
-        </Space>
-      ),
-    },
-  ];
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      qty: 32,
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      qty: 42,
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      qty: 32,
-    },
-  ];
+const TableDashboard = (props) => {
+  console.log();
   return (
-    <div>
-      <h1>Product</h1>
-      <Table columns={columns} dataSource={data} />
-    </div>
+    <>
+      <Row gutter={16} style={{ justifyContent: "center" }}>
+        <Col span={10} style={{ display: "flex", flexDirection: "column" }}>
+          <h1>History</h1>
+          <table border="1">
+            <thead>
+              <tr>
+                <th style={{ padding: "5px" }}>Product</th>
+                <th>Status</th>
+                <th>qty</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {props.subDataDetail?.detail_product.map((val) => {
+                val.createdAt = moment(val.createdAt)
+                  .subtract(10, "days")
+                  .calendar();
+
+                return <TableDetailList key={val.id} data={val} />;
+              })}
+            </tbody>
+          </table>
+        </Col>
+      </Row>
+    </>
   );
 };
 

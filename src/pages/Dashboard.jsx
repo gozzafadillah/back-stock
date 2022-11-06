@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, logout } from "../config/firebase";
+import imgDef from "../assets/img/download.png";
 
 import {
   PieChartOutlined,
@@ -9,12 +10,13 @@ import {
   ShoppingCartOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Card, Col, Layout, Menu, Row } from "antd";
-import TableDashboard from "../component/dashboard/TableDashboard";
-import { useQuery } from "@apollo/client";
+import { Layout } from "antd";
 import { GetUserById } from "../config/Apollo/Query";
+import SideBar from "../component/dashboard/SideBar";
+import Cookies from "js-cookie";
+import { useQuery } from "@apollo/client";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Footer } = Layout;
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -23,145 +25,96 @@ function getItem(label, key, icon, children) {
     label,
   };
 }
-const items = [
-  getItem("Dashboard", "1", <PieChartOutlined />),
-  getItem("Product", "2", <ShoppingCartOutlined />),
-  getItem("Stock", "3", <HddOutlined />),
-
-  getItem(
-    <div onClick={() => logout()} style={{ color: "red" }}>
-      Logout
-    </div>,
-    "4",
-    <LogoutOutlined style={{ color: "red" }} />
-  ),
-];
 
 const Dashboard = () => {
-  const [collapsed, setCollapsed] = useState(false);
-  const [user, loading] = useAuthState(auth);
-  const { data: dataUser } = useQuery(GetUserById, {
+  const [loading] = useAuthState(auth);
+  const { data: dataUser, loading: getUserLoading } = useQuery(GetUserById, {
     variables: {
-      id: localStorage.getItem("uid"),
+      id: Cookies.get("id"),
     },
+  });
+  let img = "";
+
+  useEffect(() => {
+    if (dataUser?.users[0].toko === null) {
+      alert("harap daftar toko ", navigate("/register/store"));
+    } else {
+      Cookies.set("tokoId", dataUser?.users[0].toko.id);
+    }
   });
 
   const navigate = useNavigate();
-  useEffect(() => {
-    if (loading) {
-      // maybe trigger a loading screen
-      return;
-    }
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user, loading]);
 
-  useEffect(() => {
-    if (dataUser?.users[0].tokoId === null) {
-      navigate("/register/store");
-    }
-  }, [dataUser]);
+  const logoutBtn = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const items = [
+    getItem(<Link to="/dashboard">Dashboard</Link>, "1", <PieChartOutlined />),
+    getItem(
+      <Link to="/dashboard/product">Products</Link>,
+      "2",
+      <ShoppingCartOutlined />
+    ),
+    getItem(<Link to="/dashboard/stock">Stock</Link>, "3", <HddOutlined />),
+
+    getItem(
+      <div onClick={() => logoutBtn()} style={{ color: "red" }}>
+        Logout
+      </div>,
+      "4",
+      <LogoutOutlined style={{ color: "red" }} />
+    ),
+  ];
+
+  if (dataUser?.users[0]?.toko?.image) {
+    img = dataUser?.users[0]?.toko.image;
+  } else {
+    img = imgDef;
+  }
 
   return (
-    <Layout
-      style={{
-        minHeight: "100vh",
-      }}
-    >
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-      >
-        <div className="logo" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={["1"]}
-          mode="inline"
-          items={items}
-        />
-      </Sider>
-      <Layout className="site-layout">
-        <Header
-          className="site-layout-background"
+    <>
+      {getUserLoading && loading ? (
+        <h1>Loading</h1>
+      ) : (
+        <Layout
           style={{
-            padding: 0,
+            minHeight: "100vh",
           }}
         >
-          <h1 style={{ fontSize: "x-large", fontWeight: "bolder" }}>
-            Back-Stock App
-          </h1>
-        </Header>
+          <SideBar item={items} img={img} />
+          <Layout className="site-layout">
+            <Header
+              className="site-layout-background"
+              style={{
+                padding: 0,
+              }}
+            >
+              <h1 style={{ fontSize: "x-large", fontWeight: "bolder" }}>
+                Back-Stock App
+              </h1>
+            </Header>
 
-        <Content
-          style={{
-            margin: "0 16px",
-          }}
-        >
-          <Breadcrumb
-            style={{
-              margin: "16px 0",
-            }}
-          >
-            <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
-          </Breadcrumb>
-          <div
-            className="site-layout-background"
-            style={{
-              padding: 24,
-              minHeight: 180,
-            }}
-          >
-            <div className="site-card-wrapper">
-              <Row style={{ justifyContent: "center" }} gutter={8}>
-                <Col span={4}>
-                  <Card
-                    style={{ backgroundColor: "#D3e4e4", height: "8rem" }}
-                    title="Products"
-                    bordered={true}
-                  >
-                    <h3 style={{ fontWeight: "bold" }}>0</h3>
-                  </Card>
-                </Col>
-                <Col span={4}>
-                  <Card
-                    style={{ backgroundColor: "#D3e4e4", height: "8rem" }}
-                    title="Stock"
-                    bordered={true}
-                  >
-                    <h3 style={{ fontWeight: "bold" }}>0</h3>
-                  </Card>
-                </Col>
-              </Row>
-            </div>
-          </div>
-          <div
-            className="site-layout-background"
-            style={{
-              padding: 24,
-              minHeight: 160,
-            }}
-          >
-            <Row gutter={16} style={{ justifyContent: "center" }}>
-              <Col span={10}>
-                <TableDashboard />
-              </Col>
-              <Col span={10}>
-                <TableDashboard />
-              </Col>
-            </Row>
-          </div>
-        </Content>
-        <Footer
-          style={{
-            textAlign: "center",
-          }}
-        >
-          Ant Design ©2018 Created by Ant UED
-        </Footer>
-      </Layout>
-    </Layout>
+            <Content
+              style={{
+                margin: "0 16px",
+              }}
+            >
+              <Outlet />
+            </Content>
+            <Footer
+              style={{
+                textAlign: "center",
+              }}
+            >
+              Ant Design ©2018 Created by Ant UED
+            </Footer>
+          </Layout>
+        </Layout>
+      )}
+    </>
   );
 };
 

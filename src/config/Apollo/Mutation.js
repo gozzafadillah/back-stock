@@ -5,8 +5,8 @@ const InsertTokoUser = gql`
     insert_toko(
       objects: $objects
       on_conflict: {
-        where: { userID: { _eq: $userId } }
         constraint: toko_pkey
+        where: { users: { id: { _eq: $userId } } }
       }
     ) {
       returning {
@@ -14,7 +14,6 @@ const InsertTokoUser = gql`
         namaToko
         alamat
         image
-        userID
       }
     }
   }
@@ -22,8 +21,11 @@ const InsertTokoUser = gql`
 
 const UpdateStatusTokoUser = gql`
   mutation ChangeStatUserToko($id: String!, $tokoId: String!) {
-    update_users_by_pk(pk_columns: { id: $id }, _set: { tokoId: $tokoId }) {
-      id
+    update_users(where: { id: { _eq: $id } }, _set: { tokoId: $tokoId }) {
+      returning {
+        id
+        tokoId
+      }
     }
   }
 `;
@@ -40,4 +42,66 @@ const CreateTableUser = gql`
   }
 `;
 
-export { CreateTableUser, UpdateStatusTokoUser, InsertTokoUser };
+const CreateProductData = gql`
+  mutation CreateProduct($objects: [product_insert_input!] = {}) {
+    insert_product(objects: $objects) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+const EditProduct = gql`
+  mutation UpdateProduct($id: String!, $harga: Int!, $namaProduk: String!) {
+    update_product(
+      where: { id: { _eq: $id } }
+      _set: { harga: $harga, namaProduk: $namaProduk }
+    ) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+const UpdateQtyProduct = gql`
+  mutation UpdateProduct($id: String!, $qty: Int!) {
+    update_product(where: { id: { _eq: $id } }, _set: { qty: $qty }) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+const InsertDetailProduct = gql`
+  mutation CreateDetailProduct($object: detail_product_insert_input = {}) {
+    insert_detail_product_one(object: $object) {
+      id
+      createdAt
+      produkId
+      qty
+      status
+      tokoId
+    }
+  }
+`;
+
+const DestroyProduct = gql`
+  mutation DeleteProduct($id: String!) {
+    delete_product(where: { id: { _eq: $id } }) {
+      affected_rows
+    }
+  }
+`;
+
+export {
+  CreateTableUser,
+  UpdateStatusTokoUser,
+  InsertTokoUser,
+  CreateProductData,
+  InsertDetailProduct,
+  EditProduct,
+  DestroyProduct,
+  UpdateQtyProduct,
+};

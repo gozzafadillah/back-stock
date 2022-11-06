@@ -1,6 +1,5 @@
 import { Button } from "antd";
 import React, { useState } from "react";
-import { GooglePlusOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 const LoginForm = (props) => {
@@ -29,13 +28,6 @@ const LoginForm = (props) => {
           onClick={() => props.handleClick(email, password)}
         >
           Login
-        </Button>
-        <Button
-          style={{ margin: "10px 0" }}
-          type="danger"
-          onClick={props.signInWithGoogle}
-        >
-          <GooglePlusOutlined /> Google Account
         </Button>
         <div>
           <Link to="/reset">Forgot Password</Link>

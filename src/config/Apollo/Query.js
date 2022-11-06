@@ -7,9 +7,24 @@ const GetUserById = gql`
       id
       name
       password
-      tokoId
+      toko {
+        id
+        image
+        namaToko
+      }
     }
   }
 `;
 
-export { GetUserById };
+const GetProductById = gql`
+  query GetProduct($id: String!) {
+    product_by_pk(id: $id) {
+      namaProduk
+      harga
+      qty
+      categoryId
+    }
+  }
+`;
+
+export { GetUserById, GetProductById };
