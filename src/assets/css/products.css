@@ -1,0 +1,11 @@
+.site-card-wrapper table tbody td {
+  padding: 10px 0 !important;
+}
+.site-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.site-card-wrapper Button {
+  margin: 0 5px;
+}
