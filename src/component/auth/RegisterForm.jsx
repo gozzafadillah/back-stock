@@ -149,7 +149,7 @@ const RegisterForm = (props) => {
           )}
           <div style={{ display: "flex", flexDirection: "row" }}>
             <input
-              type={!show ? "text" : "password"}
+              type={show ? "text" : "password"}
               className="register__textBox"
               value={data?.password}
               name="password"
