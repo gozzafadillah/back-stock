@@ -11,16 +11,17 @@ import {
 } from "../config/Apollo/Mutation";
 import Cookies from "js-cookie";
 import { GetUserById } from "../config/Apollo/Query";
-const DataStore = {
-  id: uuidv4(),
-  namaToko: "",
-  alamat: "",
-  imgProfile: "",
-};
 
 const RegisterStore = () => {
-  const [data, setData] = useState(DataStore);
   const [imgUrl, setImgUrl] = useState("");
+  const DataStore = {
+    id: uuidv4(),
+    namaToko: "",
+    alamat: "",
+    image: "",
+  };
+
+  const [data, setData] = useState(DataStore);
   const [progresspercent, setProgresspercent] = useState(0);
   const { data: dataUser } = useQuery(GetUserById, {
     variables: {
@@ -56,6 +57,7 @@ const RegisterStore = () => {
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImgUrl(downloadURL);
           InsertToko({
             variables: {
               userId: Cookies.get("id"),
@@ -67,18 +69,17 @@ const RegisterStore = () => {
               },
             },
           });
+          ChangeStatUserToko({
+            variables: {
+              id: Cookies.get("id"),
+              tokoId: data.id,
+            },
+          });
         });
       }
     );
 
     Cookies.set("tokoId", data.id);
-
-    ChangeStatUserToko({
-      variables: {
-        id: Cookies.get("id"),
-        tokoId: data.id,
-      },
-    });
   };
 
   function onChangeHandler(e) {
@@ -88,13 +89,12 @@ const RegisterStore = () => {
   useEffect(() => {
     console.log([[errorChangeStat, errorTokoUser]]);
   }, [errorChangeStat, errorTokoUser]);
-  console.log("updata : ", updateUser?.update_users);
 
   useEffect(() => {
     if (updateUser?.update_users.returning) {
       navigate("../dashboard");
     }
-  });
+  }, [updateUser]);
 
   return (
     <div className="register">
@@ -102,7 +102,7 @@ const RegisterStore = () => {
         <h1 style={{ textAlign: "center" }}>Register Store</h1>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={(e) => handleSubmit(e)}
           style={{ display: "flex", flexDirection: "column" }}
         >
           <input
@@ -111,6 +111,7 @@ const RegisterStore = () => {
             value={data.namaToko}
             placeholder="nama usaha"
             name="namaToko"
+            id="namaToko"
             onChange={onChangeHandler}
           />
           <textarea
@@ -118,14 +119,16 @@ const RegisterStore = () => {
             value={data.alamat}
             placeholder="alamat"
             name="alamat"
+            id="alamat"
             onChange={onChangeHandler}
           />
           <input
             type="file"
             className="register__textBox"
-            value={data.imgProfile}
+            value={data.image}
             placeholder="img"
-            name="imgProfile"
+            name="image"
+            id="image"
             onChange={onChangeHandler}
           />
           {!imgUrl && (
@@ -139,7 +142,6 @@ const RegisterStore = () => {
             </div>
           )}
           {imgUrl && <img src={imgUrl} alt="uploaded file" height={200} />}
-
           <button type="submit" style={{ margin: "10px 0" }}>
             Register
           </button>

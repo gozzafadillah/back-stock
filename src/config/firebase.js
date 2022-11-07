@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
-import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -36,7 +36,7 @@ const logInWithEmailAndPassword = async (email, password) => {
     Cookies.set("id", auth._currentUser.uid);
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    Swal.fire({ icon: "error", title: "Auntentication Failed", text: err });
   }
 };
 
@@ -73,6 +73,11 @@ const sendPasswordReset = async (email) => {
 const logout = () => {
   signOut(auth);
   Cookies.remove("id");
+  Cookies.remove("tokoId");
+  Swal.fire({
+    title: "You has been Logout",
+    icon: "success",
+  });
 };
 
 const storage = getStorage(app);
