@@ -1,17 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { CreateTableUser } from "../../config/Apollo/Mutation";
+import { uuidv4 } from "@firebase/util";
+import Cookies from "js-cookie";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../config/firebase";
 
 const RegisterForm = (props) => {
   const [data, setData] = useState(props.data);
+  const [user] = useAuthState(auth);
+  const [CreateUser] = useMutation(CreateTableUser);
+  const navigate = useNavigate();
 
   function onChangeHandler(e) {
     setData({ ...data, [e.target.name]: e.target.value });
   }
   function handleSubmit(e) {
     e.preventDefault();
-    props.registerWithEmailAndPassword(data.name, data.email, data.password);
+
+    props.registerWithEmailAndPassword(
+      uuidv4(),
+      data.name,
+      data.email,
+      data.password
+    );
   }
+
+  useEffect(() => {
+    if (user) {
+      CreateUser({
+        variables: {
+          objects: {
+            id: Cookies.get("id"),
+            email: data.email,
+            name: data.name,
+            password: data.password,
+          },
+        },
+      });
+      navigate("/login");
+    }
+  }, [user]);
 
   return (
     <div>

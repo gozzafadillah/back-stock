@@ -1,5 +1,5 @@
 import "./App.css";
-import RouteConfig from "./router/routeConfig";
+import RouteConfig from "./router/RouteConfig";
 
 function App() {
   return (
