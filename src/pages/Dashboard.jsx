@@ -16,6 +16,7 @@ import { GetUserById } from "../config/Apollo/Query";
 import SideBar from "../component/dashboard/SideBar";
 import Cookies from "js-cookie";
 import { useQuery } from "@apollo/client";
+import imgLoader from "./img-load.gif";
 
 const { Header, Content, Footer } = Layout;
 function getItem(label, key, icon, children) {
@@ -34,8 +35,8 @@ const Dashboard = () => {
       id: Cookies.get("id"),
     },
   });
+
   let img = "";
-  console.log("user login", dataUser);
 
   useEffect(() => {
     if (dataUser?.users[0].toko === null) {
@@ -86,7 +87,9 @@ const Dashboard = () => {
   return (
     <>
       {getUserLoading && loading ? (
-        <h1>Loading</h1>
+        <h1>
+          <img src={imgLoader} alt="..." />
+        </h1>
       ) : (
         <Layout
           style={{
@@ -118,7 +121,7 @@ const Dashboard = () => {
                 textAlign: "center",
               }}
             >
-              Ant Design ©2018 Created by Ant UED
+              Back Stock by Ant Design UI Element
             </Footer>
           </Layout>
         </Layout>

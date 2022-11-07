@@ -2,11 +2,13 @@ import { useMutation, useSubscription } from "@apollo/client";
 import { Breadcrumb, Button, Card, Col, Row } from "antd";
 import Cookies from "js-cookie";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import {
   insertDetailProductOne,
   UpdateQtyProduct,
 } from "../../../config/Apollo/Mutation";
 import { HistoryProductByTokoId } from "../../../config/Apollo/Subscription";
+import Swal from "sweetalert2";
 
 const Stock = () => {
   const [data, setData] = useState({
@@ -22,7 +24,6 @@ const Stock = () => {
   const [CreateDetail, { error: createDetailErr }] = useMutation(
     insertDetailProductOne
   );
-  console.log([updateProductErr, createDetailErr]);
 
   function handleOnchange(e) {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -49,6 +50,17 @@ const Stock = () => {
         },
       },
     });
+    if ((updateProductErr, createDetailErr)) {
+      Swal.fire({
+        icon: "error",
+        title: "failed add stock",
+      });
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Success add stock",
+      });
+    }
   }
   function handleIncrease(e, id, qty) {
     e.preventDefault();
@@ -71,7 +83,17 @@ const Stock = () => {
         },
       },
     });
-    console.log(id);
+    if ((updateProductErr, createDetailErr)) {
+      Swal.fire({
+        icon: "error",
+        title: "failed increase stock",
+      });
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Success increase stock",
+      });
+    }
   }
 
   return (
@@ -90,62 +112,64 @@ const Stock = () => {
           minHeight: 180,
         }}
       >
-        <div className="site-card-wrapper"></div>
-        <h3 style={{ paddingBottom: "20px" }}>Stock Product Anda</h3>
-        <Row
-          gutter={[24, 16]}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          {dataProduct?.product.map((product) => (
-            <Col span={6}>
-              <Card
-                key={product.id}
-                size="small"
-                title={product.namaProduk}
-                style={{
-                  width: 180,
-                  backgroundColor: "#d6d0d0",
-                }}
-              >
-                <p>Qty</p>
-                <p>{product.qty}</p>
-                <p>
-                  <input
-                    style={{ width: "55px" }}
-                    type="number"
-                    name="qty"
-                    id="qty"
-                    onChange={handleOnchange}
-                    placeholder={product.qty}
-                  />
-                </p>
-                <div
+        <div style={{ padding: "30px" }} className="site-card-wrapper">
+          <Row
+            gutter={[24, 16]}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            {dataProduct?.product.map((product) => (
+              <Col span={6}>
+                <Card
+                  key={product.id}
+                  size="small"
+                  title={product.namaProduk}
                   style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-around",
+                    width: 180,
+                    backgroundColor: "#d6d0d0",
                   }}
                 >
-                  <Button
-                    onClick={(e) => handleAdd(e, product.id, product.qty)}
-                    style={{ margin: "0 2px" }}
+                  <p>Qty</p>
+                  <p>{product.qty}</p>
+                  <p>
+                    <input
+                      style={{ width: "55px" }}
+                      type="number"
+                      name="qty"
+                      id="qty"
+                      onChange={handleOnchange}
+                      placeholder={product.qty}
+                    />
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-around",
+                    }}
                   >
-                    Tambah
-                  </Button>
-                  <Button
-                    onClick={(e) => handleIncrease(e, product.id, product.qty)}
-                    style={{ margin: "0 2px" }}
-                  >
-                    Kurang
-                  </Button>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+                    <Button
+                      onClick={(e) => handleAdd(e, product.id, product.qty)}
+                      style={{ margin: "0 2px" }}
+                    >
+                      Tambah
+                    </Button>
+                    <Button
+                      onClick={(e) =>
+                        handleIncrease(e, product.id, product.qty)
+                      }
+                      style={{ margin: "0 2px" }}
+                    >
+                      Kurang
+                    </Button>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
       </div>
     </div>
   );

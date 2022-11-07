@@ -10,15 +10,15 @@ import {
 import TableDashboard from "./TableDashboard";
 
 const Main = () => {
-  const {
-    data: subDataProduct,
-    loading: loadingProductSub,
-    error: subDataErr,
-  } = useSubscription(HistoryProductByTokoId, {
-    variables: {
-      tokoId: Cookies.get("tokoId"),
-    },
-  });
+  const { data: subDataProduct, error: subDataErr } = useSubscription(
+    HistoryProductByTokoId,
+    {
+      variables: {
+        tokoId: Cookies.get("tokoId"),
+      },
+    }
+  );
+
   const { data: countProduct } = useSubscription(CountProduct, {
     variables: {
       tokoId: Cookies.get("tokoId"),

@@ -1,11 +1,17 @@
 import { Menu, Layout, Image } from "antd";
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const { Sider } = Layout;
 
 const SideBar = (props) => {
   const [collapsed, setCollapsed] = useState(false);
   const [visible, setVisible] = useState(false);
+  const getPath = useLocation().pathname;
+  let path = "";
+  if (getPath === "/dashboard") path = "1";
+  else if (getPath === "/dashboard/product") path = "2";
+  else if ("/dashboard/product") path = "3";
 
   return (
     <Sider
@@ -37,7 +43,7 @@ const SideBar = (props) => {
       </div>
       <Menu
         theme="dark"
-        defaultSelectedKeys={["1"]}
+        defaultSelectedKeys={{ path }}
         mode="inline"
         items={props.item}
         style={{ marginTop: "10px" }}

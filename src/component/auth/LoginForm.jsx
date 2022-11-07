@@ -8,6 +8,7 @@ const LoginForm = (props) => {
   return (
     <div className="login">
       <div className="login__container">
+        <h1 style={{ textAlign: "center" }}>Back Stock App</h1>
         <h1 style={{ textAlign: "center" }}>Login</h1>
         <input
           type="text"

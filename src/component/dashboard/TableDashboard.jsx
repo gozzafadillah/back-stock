@@ -4,7 +4,6 @@ import React from "react";
 import TableDetailList from "./TableDetailList";
 
 const TableDashboard = (props) => {
-  console.log();
   return (
     <>
       <Row gutter={16} style={{ justifyContent: "center" }}>

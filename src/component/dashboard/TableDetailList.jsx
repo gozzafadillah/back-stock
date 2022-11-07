@@ -1,7 +1,6 @@
 import React from "react";
 
 const TableDetailList = (props) => {
-  console.log(props);
   return (
     <tr>
       <td style={{ padding: "10px" }}>{props.data?.product?.namaProduk}</td>

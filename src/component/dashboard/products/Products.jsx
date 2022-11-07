@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { DestroyProduct } from "../../../config/Apollo/Mutation";
 import "../../../assets/css/products.css";
 import ModalEdit from "./ModalEdit";
+import Swal from "sweetalert2";
 
 const Products = () => {
   const [modalProduct] = useState(false);
@@ -18,6 +19,17 @@ const Products = () => {
         id: id,
       },
     });
+    if (errDeleted) {
+      Swal.fire({
+        title: "Failed delete product",
+        icon: "error",
+      });
+    } else {
+      Swal.fire({
+        title: "Success delete product",
+        icon: "success",
+      });
+    }
   };
 
   const { data: dataProduct } = useSubscription(HistoryProductByTokoId, {

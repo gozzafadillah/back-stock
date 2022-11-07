@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import React from "react";
 import { useState } from "react";
 import { InsertDetailProduct } from "../../../config/Apollo/Mutation";
+import Swal from "sweetalert2";
 
 const ModalProduct = (props) => {
   const [product, setProduct] = useState({
@@ -14,47 +15,110 @@ const ModalProduct = (props) => {
     qty: 0,
     categoryId: 0,
   });
+  const [errorMessages, setErrorMessages] = useState({
+    namaProduk: "",
+    qty: 0,
+    harga: 0,
+  });
+
   const [modalProduct, setModalProduct] = useState(props.modalProduct);
-  const [CreateDetail, { data: detailProduct }] =
-    useMutation(InsertDetailProduct);
+  const [CreateDetail, { error: detailErr }] = useMutation(InsertDetailProduct);
+  const regexName = /^[A-Za-z ]*$/;
 
   function onChangeHandler(e) {
+    const name = e.target.name;
+    const value = e.target.value;
     setProduct({ ...product, [e.target.name]: e.target.value });
+
+    if (name === "namaProduk") {
+      if (regexName.test(value)) {
+        setErrorMessages({
+          ...errorMessages,
+          namaProduk: "",
+        });
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          namaProduk: "Nama produk harus berupa huruf",
+        });
+      }
+    }
+    if (name === "qty") {
+      if (value >= 0) {
+        setErrorMessages({
+          ...errorMessages,
+          qty: "",
+        });
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          qty: "Qty tidak boleh mines",
+        });
+      }
+    }
+    if (name === "harga") {
+      if (value >= 0) {
+        setErrorMessages({
+          ...errorMessages,
+          harga: "",
+        });
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          harga: "Harga tidak boleh mines",
+        });
+      }
+    }
   }
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    CreateDetail({
-      variables: {
-        objects: {
-          product: {
-            data: {
-              id: product.id,
-              namaProduk: product.namaProduk,
-              qty: product.qty,
-              harga: product.harga,
-              categoryId: product.categoryId,
+    if (!errorMessages.namaProduk && !errorMessages.qty) {
+      CreateDetail({
+        variables: {
+          objects: {
+            product: {
+              data: {
+                id: product.id,
+                namaProduk: product.namaProduk,
+                qty: product.qty,
+                harga: product.harga,
+                categoryId: product.categoryId,
+              },
             },
+            qty: product.qty,
+            status: "Masuk",
+            tokoId: Cookies.get("tokoId"),
           },
-          qty: product.qty,
-          status: "Masuk",
-          tokoId: Cookies.get("tokoId"),
         },
-      },
-    });
+      });
+      if (detailErr) {
+        Swal.fire({
+          title: "Failed Added product",
+          icon: "error",
+        });
+      } else {
+        Swal.fire({
+          title: "Success Added product",
+          icon: "success",
+        });
+      }
 
-    console.log([detailProduct]);
+      setProduct({
+        id: uuidv4(),
+        namaProduk: "",
+        categoryId: 0,
+        qty: 0,
+        harga: 0,
+      });
+      setErrorMessages({
+        namaProduk: "",
+        qty: 0,
+        harga: 0,
+      });
 
-    setProduct({
-      id: uuidv4(),
-      namaProduk: "",
-      categoryId: 0,
-      qty: 0,
-      harga: 0,
-    });
-
-    document.getElementById("form-product").reset();
-    setModalProduct(false);
+      document.getElementById("form-product").reset();
+      setModalProduct(false);
+    }
   };
 
   const reset = () => {
@@ -62,6 +126,11 @@ const ModalProduct = (props) => {
       id: uuidv4(),
       namaProduk: "",
       categoryId: 0,
+      qty: 0,
+      harga: 0,
+    });
+    setErrorMessages({
+      namaProduk: "",
       qty: 0,
       harga: 0,
     });
@@ -87,6 +156,9 @@ const ModalProduct = (props) => {
         visible={modalProduct}
         onOk={(e) => handleSubmit(e)}
         onCancel={() => reset()}
+        style={{
+          maxWidth: "24rem",
+        }}
       >
         <form
           style={{
@@ -104,10 +176,9 @@ const ModalProduct = (props) => {
             name="categoryId"
             id="categoryId"
           >
-            <option value="0">option</option>
+            <option value="0">Option</option>
             <option value="1">Pangan</option>
             <option value="2">Kebutuhan Rumah Tangga</option>
-            <option value="3">Makanan</option>
           </select>
           <label htmlFor="namaProduk">Nama</label>
           <input
@@ -116,15 +187,30 @@ const ModalProduct = (props) => {
             name="namaProduk"
             id="namaProduk"
           />
+          {errorMessages.namaProduk ? (
+            <p className="text-danger">{errorMessages.namaProduk}</p>
+          ) : (
+            ""
+          )}
           <label htmlFor="qty">Quantity</label>
           <input type="number" onChange={onChangeHandler} name="qty" id="qty" />
-          <label htmlFor="qty">Harga</label>
+          {errorMessages.qty ? (
+            <p className="text-danger">{errorMessages.qty}</p>
+          ) : (
+            ""
+          )}
+          <label htmlFor="harga">Harga</label>
           <input
             type="number"
             onChange={onChangeHandler}
             name="harga"
             id="harga"
           />
+          {errorMessages.harga ? (
+            <p className="text-danger">{errorMessages.harga}</p>
+          ) : (
+            ""
+          )}
         </form>
       </Modal>
     </>
