@@ -56,7 +56,7 @@ const Dashboard = () => {
   const items = [
     getItem(
       <div style={{ color: "white", fontWeight: "bold" }}>
-        {dataUser?.users[0].toko?.namaToko.toUpperCase()}
+        {dataUser?.users[0].toko?.namaToko?.toUpperCase()}
       </div>,
       "0",
       <UserOutlined />
