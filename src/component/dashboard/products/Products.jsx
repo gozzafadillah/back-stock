@@ -69,7 +69,7 @@ const Products = () => {
               {dataProduct?.product.map((data) => (
                 <tr key={data.id}>
                   <td>{data.namaProduk}</td>
-                  <td>{data.harga}</td>
+                  <td>Rp {data.harga}</td>
                   <td>{data.qty}</td>
                   <td>
                     <ModalEdit modalProduct={modalProduct} id={data.id} />
