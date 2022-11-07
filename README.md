@@ -27,3 +27,6 @@ Back Stock merupakan applikasi bertemakan management pada sebuah toko untuk meng
 ## Link Deployment
 
 [back-stock.vercel.app](https://back-stock.vercel.app/login)
+
+## PPT
+[Link PPT](https://docs.google.com/presentation/d/1Ca6XiM1QYHm3ffRF8wwAEpMU7FyzQyFL55El0a-Yapk/edit?usp=sharing)
