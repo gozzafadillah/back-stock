@@ -23,3 +23,7 @@ Back Stock merupakan applikasi bertemakan management pada sebuah toko untuk meng
 ## Figma
 
 [link Figma](https://www.figma.com/file/9pQ44uGLaHqAZiqiux0Hjj/Stock-Management---Mini-Project-Batch-3?node-id=0%3A1)
+
+## Link Deployment
+
+[back-stock.vercel.app](https://back-stock.vercel.app/login)

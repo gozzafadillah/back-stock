@@ -13,7 +13,7 @@ const httpLink = new HttpLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://outgoing-snake-72.hasura.app/v1/graphql",
+    url: "wss://outgoing-snake-72.hasura.app/v1/graphql",
     connectionParams: {
       headers: {
         "x-hasura-admin-secret":
