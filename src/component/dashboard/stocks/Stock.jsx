@@ -2,7 +2,6 @@ import { useMutation, useSubscription } from "@apollo/client";
 import { Breadcrumb, Button, Card, Col, Row } from "antd";
 import Cookies from "js-cookie";
 import React, { useState } from "react";
-import { useEffect } from "react";
 import {
   insertDetailProductOne,
   UpdateQtyProduct,
