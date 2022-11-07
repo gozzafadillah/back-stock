@@ -44,7 +44,7 @@ const Stock = () => {
         object: {
           tokoId: Cookies.get("tokoId"),
           produkId: id,
-          qty: totalQty,
+          qty: data.qty,
           status: "Masuk",
         },
       },
@@ -66,7 +66,7 @@ const Stock = () => {
         object: {
           tokoId: Cookies.get("tokoId"),
           produkId: id,
-          qty: totalQty,
+          qty: data.qty,
           status: "Keluar",
         },
       },
