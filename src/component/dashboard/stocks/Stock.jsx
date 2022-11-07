@@ -14,6 +14,9 @@ const Stock = () => {
   const [data, setData] = useState({
     qty: 0,
   });
+  const [errorMessages, setErrorMessages] = useState({
+    qty: "",
+  });
   const { data: dataProduct } = useSubscription(HistoryProductByTokoId, {
     variables: {
       tokoId: Cookies.get("tokoId"),
@@ -26,74 +29,109 @@ const Stock = () => {
   );
 
   function handleOnchange(e) {
+    const name = e.target.name;
+    const value = e.target.value;
     setData({ ...data, [e.target.name]: e.target.value });
+    if (name === "qty") {
+      if (value >= 0) {
+        setErrorMessages({
+          ...errorMessages,
+          qty: "",
+        });
+      } else {
+        setErrorMessages({
+          ...errorMessages,
+          qty: "Qty produk harus Positif",
+        });
+      }
+    }
+    console.log(errorMessages);
   }
 
   function handleAdd(e, id, qty) {
     e.preventDefault();
-
-    let oldQty = qty;
-    let totalQty = 1 * oldQty + 1 * data.qty;
-    updateProductQty({
-      variables: {
-        id: id,
-        qty: totalQty,
-      },
-    });
-    CreateDetail({
-      variables: {
-        object: {
-          tokoId: Cookies.get("tokoId"),
-          produkId: id,
-          qty: data.qty,
-          status: "Masuk",
+    if (!errorMessages.qty) {
+      let oldQty = qty;
+      let totalQty = 1 * oldQty + 1 * data.qty;
+      updateProductQty({
+        variables: {
+          id: id,
+          qty: totalQty,
         },
-      },
-    });
-    if ((updateProductErr, createDetailErr)) {
-      Swal.fire({
-        icon: "error",
-        title: "failed add stock",
       });
+      CreateDetail({
+        variables: {
+          object: {
+            tokoId: Cookies.get("tokoId"),
+            produkId: id,
+            qty: data.qty,
+            status: "Masuk",
+          },
+        },
+      });
+      if ((updateProductErr, createDetailErr)) {
+        Swal.fire({
+          icon: "error",
+          title: "failed add stock",
+        });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Success add stock",
+        });
+      }
     } else {
       Swal.fire({
-        icon: "success",
-        title: "Success add stock",
+        icon: "error",
+        title: "Qty diluar kapasitas",
       });
     }
+    setData({
+      qty: 0,
+    });
   }
   function handleIncrease(e, id, qty) {
     e.preventDefault();
 
-    let oldQty = qty;
-    let totalQty = 1 * oldQty - 1 * data.qty;
-    updateProductQty({
-      variables: {
-        id: id,
-        qty: totalQty,
-      },
-    });
-    CreateDetail({
-      variables: {
-        object: {
-          tokoId: Cookies.get("tokoId"),
-          produkId: id,
-          qty: data.qty,
-          status: "Keluar",
+    if (!errorMessages.qty) {
+      let oldQty = qty;
+      let totalQty = 1 * oldQty - 1 * data.qty;
+      updateProductQty({
+        variables: {
+          id: id,
+          qty: totalQty,
         },
-      },
-    });
-    if ((updateProductErr, createDetailErr)) {
-      Swal.fire({
-        icon: "error",
-        title: "failed increase stock",
       });
+      CreateDetail({
+        variables: {
+          object: {
+            tokoId: Cookies.get("tokoId"),
+            produkId: id,
+            qty: data.qty,
+            status: "Keluar",
+          },
+        },
+      });
+      if ((updateProductErr, createDetailErr)) {
+        Swal.fire({
+          icon: "error",
+          title: "failed increase stock",
+        });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Success increase stock",
+        });
+      }
     } else {
       Swal.fire({
-        icon: "success",
-        title: "Success increase stock",
+        icon: "error",
+        title: "Qty diluar kapasitas",
       });
     }
+    setData({
+      qty: 0,
+    });
   }
 
   return (
