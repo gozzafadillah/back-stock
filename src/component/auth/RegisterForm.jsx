@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
 import { EyeOutlined } from "@ant-design/icons";
+import Swal from "sweetalert2";
 
 const RegisterForm = (props) => {
   const [data, setData] = useState(props.data);
@@ -82,6 +83,10 @@ const RegisterForm = (props) => {
         data.email,
         data.password
       );
+      Swal.fire({
+        icon: "success",
+        title: "you has been register",
+      });
     }
   }
 
